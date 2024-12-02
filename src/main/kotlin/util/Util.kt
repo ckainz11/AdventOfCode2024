@@ -157,44 +157,6 @@ data class Point3(val x: Int, val y: Int, val z: Int) {
 
 /*----- List Functions -----*/
 
-fun <T> List<T>.pairwise() = mapIndexed { index, first -> drop(index + 1).map { second -> first to second } }.flatten()
-fun <T, R> List<T>.pairwise(transform: (T, T) -> R) =
-    mapIndexed { index, first -> drop(index + 1).map { second -> transform(first, second) } }.flatten()
-
-fun <E> permutations(list: List<E>, length: Int? = null): Sequence<List<E>> = sequence {
-    val n = list.size
-    val r = length ?: list.size
-
-    val indices = list.indices.toMutableList()
-    val cycles = (n downTo (n - r)).toMutableList()
-    yield(indices.take(r).map { list[it] })
-
-    while (true) {
-        var broke = false
-        for (i in (r - 1) downTo 0) {
-            cycles[i]--
-            if (cycles[i] == 0) {
-                val end = indices[i]
-                for (j in i until indices.size - 1) {
-                    indices[j] = indices[j + 1]
-                }
-                indices[indices.size - 1] = end
-                cycles[i] = n - i
-            } else {
-                val j = cycles[i]
-                val tmp = indices[i]
-                indices[i] = indices[-j + indices.size]
-                indices[-j + indices.size] = tmp
-                yield(indices.take(r).map { list[it] })
-                broke = true
-                break
-            }
-        }
-        if (!broke) {
-            break
-        }
-    }
-}
 /*-----Helper Functions-----*/
 
 private fun <T> transposeMatrix(matrix: Matrix<T>): Matrix<T> = List(matrix.getColNum()) { i -> matrix.getColumn(i) }
@@ -226,48 +188,6 @@ infix fun IntRange.overlaps(other: IntRange): Boolean =
 
 infix fun IntRange.containsRange(other: IntRange): Boolean = other.first in this && other.last in this
 infix fun IntRange.adjoint(other: IntRange): Boolean = this.last + 1 == other.first || other.last + 1 == this.first
-
-/*-----String & Char Functions-----*/
-
-fun String.allInts() = allIntsInString(this)
-fun String.allLongs(): List<Long> = """\d+""".toRegex().findAll(this)
-    .map { it.value.toLong() }
-    .toList()
-
-fun allIntsInString(line: String): List<Int> {
-    return """-?\d+""".toRegex().findAll(line)
-        .map { it.value.toInt() }
-        .toList()
-}
-
-fun String.firstInt(): Int = """-?\d+""".toRegex().find(this)!!.value.toInt()
-
-fun String.hexToBinaryString(): String {
-    val num = this.uppercase(Locale.getDefault())
-    var binary = ""
-    for (hex in num) {
-        when (hex) {
-            '0' -> binary += "0000"
-            '1' -> binary += "0001"
-            '2' -> binary += "0010"
-            '3' -> binary += "0011"
-            '4' -> binary += "0100"
-            '5' -> binary += "0101"
-            '6' -> binary += "0110"
-            '7' -> binary += "0111"
-            '8' -> binary += "1000"
-            '9' -> binary += "1001"
-            'A' -> binary += "1010"
-            'B' -> binary += "1011"
-            'C' -> binary += "1100"
-            'D' -> binary += "1101"
-            'E' -> binary += "1110"
-            'F' -> binary += "1111"
-        }
-    }
-    return binary
-}
-
 
 /*-----Math Functions-----*/
 fun leastCommonMultiple(a: Long, b: Long): Long {
