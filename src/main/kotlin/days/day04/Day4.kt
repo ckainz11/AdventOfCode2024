@@ -6,7 +6,7 @@ import util.*
 class Day4(override val input: String) : Day<Int>(input) {
 
 	private val matrix = input.lines().map { it.toList() }
-	private val sam = listOf("MAS", "SAM")
+	private val diagonals = listOf("MAS", "SAM")
 
 	override fun solve1(): Int = matrix.mapMatrixIndexed { point, c ->
 		if (c != 'X') 0
@@ -19,7 +19,7 @@ class Day4(override val input: String) : Day<Int>(input) {
 			for (x in 0..<matrix[y].size - 2) {
 				val subMatrix = matrix.subMatrix(3, 3, Point(x, y))
 				val (left, right) = getDiagonals(subMatrix)
-				if (sam.any { it == left } && sam.any { it == right })
+				if (diagonals.any { it == left } && diagonals.any { it == right })
 					count++
 			}
 		}
