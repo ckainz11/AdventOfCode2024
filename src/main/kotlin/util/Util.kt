@@ -26,8 +26,6 @@ fun <T> Matrix<T>.matrixForEachIndexed(action: (Point, T) -> Unit) {
 	this.forEachIndexed { y, row -> row.forEachIndexed { x, col -> action(Point(x, y), col) } }
 }
 
-fun <T> Matrix<T>.sum(sum: (T) -> Int): Int = this.sumOf { row -> row.sumOf { sum(it) } }
-
 /**
  * Returns index of the first element matching the given [predicate], or -1 if the list does not contain such element.
  */
