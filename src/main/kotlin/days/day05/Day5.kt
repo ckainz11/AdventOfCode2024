@@ -18,11 +18,10 @@ class Day5(override val input: String) : Day<Int>(input) {
 
 	override fun solve2() = updates
 		.filter { !it.isValid() }
-		.map { it.sorted() }
-		.sumOf { it.middle() }
+		.sumOf { it.sortedPages().middle() }
 
 	private fun List<Int>.isValid() = pairwise().all { it in rules }
-	private fun List<Int>.sorted() = map { Page(it, rules) }.sorted().map { it.value }
+	private fun List<Int>.sortedPages() = map { Page(it, rules) }.sorted().map { it.value }
 
 	data class Page(val value: Int, val rules: List<Pair<Int, Int>>) : Comparable<Page> {
 
