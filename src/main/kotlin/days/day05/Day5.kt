@@ -28,8 +28,7 @@ class Day5(override val input: String) : Day<Int>(input) {
 
 		override fun compareTo(other: Page): Int {
 			if (value == other.value) return 0
-			val entry = rules.firstOrNull { it.first == value && it.second == other.value }
-			return if (entry != null) 1 else -1
+			return if (value to other.value in rules) -1 else 1
 		}
 
 	}
