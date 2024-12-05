@@ -22,13 +22,13 @@ class Day5(override val input: String) : Day<Int>(input) {
 		.sumOf { it.middle() }
 
 	private fun List<Int>.isValid() = pairwise().all { it in rules }
-	private fun List<Int>.sorted() = map { Page(it, rules) }.sorted().map { it.item }
+	private fun List<Int>.sorted() = map { Page(it, rules) }.sorted().map { it.value }
 
-	data class Page(val item: Int, val rules: List<Pair<Int, Int>>) : Comparable<Page> {
+	data class Page(val value: Int, val rules: List<Pair<Int, Int>>) : Comparable<Page> {
 
 		override fun compareTo(other: Page): Int {
-			if (item == other.item) return 0
-			val entry = rules.firstOrNull { it.first == item && it.second == other.item }
+			if (value == other.value) return 0
+			val entry = rules.firstOrNull { it.first == value && it.second == other.value }
 			return if (entry != null) 1 else -1
 		}
 
