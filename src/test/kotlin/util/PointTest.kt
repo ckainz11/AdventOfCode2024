@@ -3,7 +3,7 @@ package util
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
-class PointUtilsTest {
+class PointTest {
 
 	/*----- rotating -----*/
 

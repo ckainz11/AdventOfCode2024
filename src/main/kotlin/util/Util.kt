@@ -100,19 +100,6 @@ fun <T, R> Matrix<T>.mapMatrixIndexedNotNull(transform: (Point, T) -> R) = this.
 	row.mapIndexedNotNull { x, it -> transform(Point(x, y), it) }
 }
 
-data class Point3(val x: Int, val y: Int, val z: Int) {
-
-	operator fun plus(other: Point3) = Point3(other.x + x, other.y + y, other.z + z)
-	operator fun minus(other: Point3) = Point3(other.x - x, other.y - y, other.z - z)
-	operator fun times(n: Int) = Point3(x * n, y * n, z * n)
-
-	fun neighbors(): List<Point3> = listOf(
-		Point3(x + 1, y, z), Point3(x - 1, y, z),
-		Point3(x, y + 1, z), Point3(x, y - 1, z),
-		Point3(x, y, z + 1), Point3(x, y, z - 1),
-	)
-}
-
 /*-----Helper Functions-----*/
 
 private fun <T> rotateMatrix(matrix: Matrix<T>): Matrix<T> = List(matrix.xRange().last + 1) { i -> matrix.getColumn(i) }
