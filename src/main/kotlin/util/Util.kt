@@ -113,8 +113,6 @@ data class Point3(val x: Int, val y: Int, val z: Int) {
 	)
 }
 
-/*----- List Functions -----*/
-
 /*-----Helper Functions-----*/
 
 private fun <T> rotateMatrix(matrix: Matrix<T>): Matrix<T> = List(matrix.xRange().last + 1) { i -> matrix.getColumn(i) }
@@ -138,15 +136,8 @@ fun <T> getCol(array: List<List<T>>, col: Int): List<T> {
 	return column
 }
 
-/*-----Range Functions-----*/
-
-infix fun IntRange.overlaps(other: IntRange): Boolean =
-	first in other || last in other || other.first in this || other.last in this
-
-infix fun IntRange.containsRange(other: IntRange): Boolean = other.first in this && other.last in this
-infix fun IntRange.adjoint(other: IntRange): Boolean = this.last + 1 == other.first || other.last + 1 == this.first
-
 /*-----Math Functions-----*/
+
 fun leastCommonMultiple(a: Long, b: Long): Long {
 	val larger = if (a > b) a else b
 	val maxLcm = a * b
