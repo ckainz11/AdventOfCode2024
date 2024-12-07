@@ -28,10 +28,8 @@ class Day7(override val input: String) : Day<Long>(input) {
 		}
 
 		fun solvable(part: Int, actual: Long = this.numbers.first(), numbers: List<Long> = this.numbers.drop(1)): Boolean {
-			if (actual == result && numbers.isEmpty()) return true
-
+			if (numbers.isEmpty()) return actual == result
 			if (actual > result) return false
-			if (numbers.isEmpty()) return false
 
 			return if (part == 1) operations.any { solvable(part, it(actual, numbers.first()), numbers.drop(1)) }
 			else part2Operations.any { solvable(part, it(actual, numbers.first()), numbers.drop(1)) }
