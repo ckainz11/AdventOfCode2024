@@ -1,7 +1,5 @@
 package util
 
-import java.util.*
-
 /*-----Number Parsing-----*/
 
 fun String.allInts() = allNumbersInString(this).map { it.toInt() }
@@ -17,3 +15,5 @@ private fun allNumbersInString(line: String): List<String> {
 /*-----Input Parsing-----*/
 
 fun String.sections() = this.split("\n\n")
+
+fun String.asMatrix() = this.lines().map { it.toCharArray().toList() }
