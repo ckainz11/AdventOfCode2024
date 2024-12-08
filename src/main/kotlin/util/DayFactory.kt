@@ -8,7 +8,7 @@ import days.day04.Day4
 import days.day05.Day5
 import days.day06.Day6
 import days.day07.Day7
-import days.day8.Day8
+import days.day08.Day8
 
 class DayFactory {
 	companion object {

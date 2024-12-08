@@ -1,4 +1,4 @@
-package days.day8
+package days.day08
 
 import days.Day
 import util.Point
