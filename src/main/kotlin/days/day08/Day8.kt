@@ -1,10 +1,7 @@
 package days.day08
 
 import days.Day
-import util.Point
-import util.asMatrix
-import util.mapMatrixIndexedNotNull
-import util.pairwise
+import util.*
 
 class Day8(override val input: String) : Day<Int>(input) {
 
@@ -13,12 +10,14 @@ class Day8(override val input: String) : Day<Int>(input) {
 		.mapMatrixIndexedNotNull { point, c -> if (c == '.') null else c to point }
 		.groupBy { it.first }
 		.mapValues { it.value.map { pair -> pair.second } }
-		.values.map { Frequency(it, grid) }
+		.values.map { antennas -> Frequency(antennas, grid) }
 
-	override fun solve1(): Int = frequencies.flatMap { it.getAntinodes(part = 1) }.distinct().size
-	override fun solve2(): Int = frequencies.flatMap { it.getAntinodes(part = 2) }.distinct().size
+	override fun solve1(): Int = solve(part = 1)
+	override fun solve2(): Int = solve(part = 2)
 
-	data class Frequency(val antennas: List<Point>, private val grid: List<List<Char>>) {
+	private fun solve(part: Int) = frequencies.flatMap { it.getAntinodes(part) }.distinct().size
+
+	data class Frequency(val antennas: List<Point>, private val grid: Matrix<Char>) {
 
 		fun getAntinodes(part: Int) = antennas.pairwise().flatMap { (a, b) ->
 			val dist = b - a
