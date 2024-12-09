@@ -27,75 +27,59 @@ class Day9(override val input: String) : Day<Long>(input) {
 		return fileSystem.mapIndexed { index, i -> if (i == -1L) 0L else index * i }.sum()
 	}
 
-	private var lastBlockEnd = 0
-	private val blocks = input.dropLast(1).chunked(2).flatMapIndexed { index, s ->
-		s.map { it.digitToInt() }.let { (occupied, free) ->
-			listOf(
-				Block(index, occupied, (lastBlockEnd..<lastBlockEnd + occupied)),
-				Block(-1, free, (lastBlockEnd + occupied..<(lastBlockEnd + occupied + free)))
-					.also { lastBlockEnd = it.indices.last + 1 }
-			)
+	private val blocks = (input.dropLast(1).chunked(2).flatMapIndexed { index: Int, s: String ->
+		listOf(
+			Block(s[0].digitToInt(), index),
+			Block(s[1].digitToInt(), -1)
+		)
+	} + Block(input.last().digitToInt(), input.length / 2)).filter { it.size != 0 }.toMutableList()
+
+	override fun solve2(): Long {
+		var i = blocks.size - 1
+		while (i >= 0) {
+			val toMove = blocks[i]
+			if (toMove.isFree()) {
+				i--
+				continue
+			}
+
+			for (j in 0..<i) {
+				val freeBlock = blocks[j]
+
+				if (!freeBlock.isFree() || freeBlock.size < toMove.size)
+					continue
+
+				blocks.add(j, toMove)
+				val newSize = freeBlock.size - toMove.size
+				if (newSize > 0) {
+					blocks[j + 1] = Block(newSize, -1)
+					i++
+				} else
+					blocks.removeAt(j + 1)
+
+				blocks[i] = Block(toMove.size, -1)
+				break
+			}
+			i--
 		}
-	}.let {
-		it + Block(input.length / 2, input.last().digitToInt(), (lastBlockEnd..lastBlockEnd + input.last().digitToInt()))
-	}.filter { it.size > 0 }
+		var checksum = 0L
+		var index = 0
+		for (block in blocks) {
+			for (x in 0..<block.size) {
+				checksum += if (block.isFree()) 0 else index * block.id
+				index++
+			}
+		}
+		return checksum
+	}
 
-	private val freeBlocks = ArrayDeque(blocks.filter { it.isFree() })
-	private val filledBlocks = ArrayDeque(blocks.filter { !it.isFree() }.reversed())
-	private val blockedFileSystem = filledBlocks.associateBy { it.indices }.toMutableMap()
-
-	data class Block(val id: Int, var size: Int, var indices: IntRange) {
+	data class Block(val size: Int, val id: Int) {
 
 		fun isFree() = id == -1
 
-		fun subtract(block: Block) {
-			size -= block.size
-
-			indices =
-				if (size == 1) indices.last..indices.last
-				else indices.first + block.size..<indices.last
+		override fun toString(): String {
+			return (0..<size).joinToString("") { if (isFree()) "." else id.toString() }
 		}
-	}
-
-	override fun solve2(): Long {
-
-		while (freeBlocks.isNotEmpty()) {
-			val freeBlock = freeBlocks.removeFirst()
-
-			val tooLargeBlocks = mutableListOf<Block>()
-			filled@
-			while (filledBlocks.isNotEmpty()) {
-				val filledBlock = filledBlocks.removeFirst()
-
-				if (freeBlock.indices.last > filledBlock.indices.first)
-					break
-
-				// try next block
-				if (filledBlock.size > freeBlock.size) {
-					tooLargeBlocks.add(filledBlock)
-					continue@filled
-				}
-
-				if (filledBlock.size == freeBlock.size) {
-					blockedFileSystem.remove(filledBlock.indices)
-					blockedFileSystem[freeBlock.indices] = filledBlock
-					break@filled
-				}
-
-				blockedFileSystem.remove(filledBlock.indices)
-
-				// move as much as possible
-				blockedFileSystem[freeBlock.indices.first..<freeBlock.indices.first + filledBlock.size] = filledBlock
-
-				// update free block
-				freeBlock.subtract(filledBlock)
-				freeBlocks.addFirst(freeBlock)
-				break@filled
-			}
-			tooLargeBlocks.asReversed().forEach { filledBlocks.addFirst(it) }
-		}
-
-		return blockedFileSystem.map { (indices, block) -> if (block.id == -1) 0L else indices.sumOf { it.toLong() * block.id } }.sum()
 	}
 
 }
