@@ -2,6 +2,7 @@ package util
 
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 
 class PointTest {
 
@@ -86,5 +87,40 @@ class PointTest {
 		val expected = 10
 		val actual = point.mDist(other)
 		assertEquals(expected, actual)
+	}
+
+	/*----- inBounds -----*/
+	private val grid = emptyMatrixOf(3, 3, 0)
+
+	@Test
+	fun `inBoundsOf should return true for point in bounds`() {
+		val point = Point(1, 1)
+		val actual = point inBoundsOf grid
+		assertEquals(true, actual)
+	}
+
+	@Test
+	fun `inBoundsOf should return false for point out of bounds`() {
+		val point = Point(3, 3)
+		val actual = point inBoundsOf grid
+		assertEquals(false, actual)
+	}
+
+	/*----- cardinalNeighbors -----*/
+
+	@Test
+	fun `cardinalNeighbors should return all cardinal neighbors`() {
+		val point = Point(1, 1)
+		val expected = listOf(Point(2, 1), Point(1, 2), Point(0, 1), Point(1, 0))
+		val actual = point.cardinalNeighbors()
+		assertEquals(expected, actual)
+	}
+
+	@Test
+	fun `cardinalNeighbors should not return diagonal neighbors`() {
+		val point = Point(1, 1)
+		val notExpected = listOf(Point(2, 2), Point(0, 0), Point(0, 2), Point(2, 0))
+		val actual = point.cardinalNeighbors()
+		notExpected.forEach { assertFalse(it in actual) }
 	}
 }
