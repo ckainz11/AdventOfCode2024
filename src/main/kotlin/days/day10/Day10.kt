@@ -18,7 +18,6 @@ class Day10(override val input: String) : Day<Int>(input) {
 		if (grid[current] == 9) return listOf(current)
 		val nextSteps = current.cardinalNeighbors()
 			.filter { next -> next inBoundsOf grid && grid[next] == grid[current] + 1 }
-		if (nextSteps.isEmpty()) return emptyList()
 		return nextSteps.flatMap { calc(it) }
 	}
 }
