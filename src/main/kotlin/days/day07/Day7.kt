@@ -1,6 +1,6 @@
 package days.day07
 
-import days.Day
+import setup.Day
 import util.allLongs
 
 fun Long.concat(other: Long) = "$this$other".toLong()

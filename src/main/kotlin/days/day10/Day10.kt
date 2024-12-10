@@ -1,6 +1,6 @@
 package days.day10
 
-import days.Day
+import setup.Day
 import util.*
 
 class Day10(override val input: String) : Day<Int>(input) {

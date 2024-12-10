@@ -1,6 +1,6 @@
 package days.day05
 
-import days.Day
+import setup.Day
 import util.allInts
 import util.middle
 import util.sections

@@ -1,6 +1,6 @@
 package days.day02
 
-import days.Day
+import setup.Day
 import util.allInts
 import kotlin.math.abs
 
