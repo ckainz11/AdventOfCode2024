@@ -14,11 +14,11 @@ class Day10(override val input: String) : Day<Int>(input) {
 	private fun Point.calcScore() = calc(this).distinct().size
 	private fun Point.calcRating() = calc(this).size
 
-	private fun calc(trailhead: Point): List<Point> {
-		if (grid[trailhead] == 9) return listOf(trailhead)
-		val neighbors = trailhead.cardinalNeighbors()
-			.filter { it inBoundsOf grid && grid[it] == grid[trailhead] + 1 }
-		if (neighbors.isEmpty()) return emptyList()
-		return neighbors.flatMap { calc(it) }
+	private fun calc(current: Point): List<Point> {
+		if (grid[current] == 9) return listOf(current)
+		val nextSteps = current.cardinalNeighbors()
+			.filter { next -> next inBoundsOf grid && grid[next] == grid[current] + 1 }
+		if (nextSteps.isEmpty()) return emptyList()
+		return nextSteps.flatMap { calc(it) }
 	}
 }
