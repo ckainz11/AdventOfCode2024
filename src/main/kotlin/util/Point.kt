@@ -26,6 +26,8 @@ data class Point(var x: Int, var y: Int) {
 		}
 	}
 
+	fun cardinalNeighbors() = cardinals.map { this + it }
+
 	companion object {
 
 		val LEFT = Point(-1, 0)
