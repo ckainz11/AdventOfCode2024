@@ -17,12 +17,12 @@ class Day11(override val input: String) : Day<Long>(input) {
 		else blinkCache.getOrPut(stone to times) {
 			val s = stone.toString()
 			if (stone == 0L) change(1, times - 1)
-			else if (s.isEvenLength()) s.halved().sumOf { change(it.toLong(), times - 1) }
+			else if (s.hasEvenLength()) s.halved().sumOf { change(it.toLong(), times - 1) }
 			else change(stone * 2024, times - 1)
 		}
 	}
 
 	private fun String.halved() = chunked(length / 2)
-	private fun String.isEvenLength() = length % 2 == 0
+	private fun String.hasEvenLength() = length % 2 == 0
 
 }
