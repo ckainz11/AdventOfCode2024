@@ -7,7 +7,30 @@ class Day12(override val input: String) : Day<Int>(input) {
 
 	private val grid = input.asMatrix()
 	private val coords = grid.mapMatrixIndexedNotNull { p, _ -> p }
-	private val regions = buildList {
+	private val regions = getRegions()
+
+	override fun solve1(): Int = getTotalPrice(part = 1)
+	override fun solve2(): Int = getTotalPrice(part = 2)
+	private fun getTotalPrice(part: Int) = regions.sumOf { it.getPrice(part) }
+
+	data class Region(val coords: Set<Point>) {
+
+		fun getPrice(part: Int) = area * if (part == 1) perimeter else numOfSides
+
+		private val area = coords.size
+		private val perimeter = coords.sumOf { p -> p.cardinalNeighbors().count { it !in coords } }
+
+		private val numOfSides = coords.sumOf { point ->
+			(Point.cardinals + Point.cardinals.first()).zipWithNext().count { (d1, d2) ->
+				val a = point + d1
+				val b = point + d2
+				val c = point + d1 + d2
+				(a !in coords && b !in coords) || (a in coords && b in coords && c !in coords)
+			}
+		}
+	}
+
+	private fun getRegions() = buildList {
 		val visited = mutableSetOf<Point>()
 		for (p in coords) {
 			if (p in visited) continue
@@ -17,28 +40,10 @@ class Day12(override val input: String) : Day<Int>(input) {
 				val current = queue.removeFirst()
 				if (!visited.add(current)) continue
 				regionCoords.add(current)
-				val neighbors = current.cardinalNeighbors().filter { it in coords && grid[p] == grid[it] }
+				val neighbors = grid.getCardinalNeighborsOf(current).filter { it in coords && grid[p] == grid[it] }
 				queue.addAll(neighbors)
 			}
 			add(Region(regionCoords))
-		}
-	}
-
-	override fun solve1(): Int = regions.sumOf { it.area * it.perimeter }
-	override fun solve2(): Int = regions.sumOf { it.area * it.numOfSides() }
-
-	data class Region(val coords: Set<Point>) {
-
-		val area = coords.size
-		val perimeter = coords.sumOf { p -> p.cardinalNeighbors().count { it !in coords } }
-
-		fun numOfSides(): Int = coords.sumOf { point ->
-			(Point.cardinals + Point.cardinals.first()).zipWithNext().count { (d1, d2) ->
-				val a = point + d1
-				val b = point + d2
-				val c = point + d1 + d2
-				(a !in coords && b !in coords) || (a in coords && b in coords && c !in coords)
-			}
 		}
 	}
 }
