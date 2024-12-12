@@ -61,7 +61,7 @@ fun <T> Matrix<T>.matrixForEachIndexed(action: (Point, T) -> Unit) {
 }
 
 /**
- * Returns index of the first element matching the given [predicate], or -1 if the list does not contain such element.
+ * Returns index of the first element matching the given [predicate], or a [Point] of (-1, -1) if the list does not contain such element.
  */
 fun <T> Matrix<T>.matrixIndexOfFirst(predicate: (T) -> Boolean): Point {
 	for ((y, row) in this.withIndex()) {
@@ -77,6 +77,14 @@ fun <T : Comparable<T>> Matrix<T>.matrixMax(): T = this.mapNotNull { it.maxOrNul
 fun <T : Comparable<T>> Matrix<T>.matrixMin(): T = this.mapNotNull { it.minOrNull() }.minOrNull()!!
 fun <T> Matrix<T>.matrixCount(predicate: (T) -> Boolean) = this.sumOf { it.count(predicate) }
 fun <T> Matrix<T>.matrixSumOf(selector: (T) -> Int) = this.sumOf { it.sumOf(selector) }
+
+/*----- Point Integrations -----*/
+
+/**
+ * Returns a list of all the cardinal neighbors of [p] that are also in the [Matrix].
+ * @param p the point to get the neighbors of
+ */
+fun <T> Matrix<T>.getCardinalNeighborsOf(p: Point): List<Point> = p.cardinalNeighbors().filter { it inBoundsOf this }
 
 /*----- Rotating -----*/
 
