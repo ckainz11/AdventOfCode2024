@@ -20,14 +20,16 @@ class Day12(override val input: String) : Day<Int>(input) {
 		private val area = coords.size
 		private val perimeter = coords.sumOf { p -> p.cardinalNeighbors().count { it !in coords } }
 
-		private val numOfSides = coords.sumOf { point ->
-			(Point.cardinals + Point.cardinals.first()).zipWithNext().count { (d1, d2) ->
-				val a = point + d1
-				val b = point + d2
-				val c = point + d1 + d2
+		private val numOfSides = coords.sumOf { point -> point.numberOfCorners() }
+
+		private fun Point.numberOfCorners() = (Point.cardinals + Point.cardinals.first())
+			.zipWithNext()
+			.count { (d1, d2) ->
+				val a = this + d1
+				val b = this + d2
+				val c = this + d1 + d2
 				(a !in coords && b !in coords) || (a in coords && b in coords && c !in coords)
 			}
-		}
 	}
 
 	private fun getRegions() = buildList {
