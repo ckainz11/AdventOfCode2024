@@ -11,6 +11,7 @@
       <option name="KEEP_BLANK_LINES_BEFORE_RBRACE" value="1" />
       <option name="BLANK_LINES_AFTER_CLASS_HEADER" value="1" />
       <indentOptions>
+        <option name="CONTINUATION_INDENT_SIZE" value="0" />
         <option name="USE_TAB_CHARACTER" value="true" />
       </indentOptions>
     </codeStyleSettings>
