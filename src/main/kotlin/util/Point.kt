@@ -8,6 +8,7 @@ data class Point(var x: Int, var y: Int) {
 	operator fun plus(other: Point) = Point(other.x + x, other.y + y)
 	operator fun minus(other: Point) = Point(x - other.x, y - other.y)
 	operator fun times(n: Int) = Point(x * n, y * n)
+	operator fun rem(other: Point) = Point(x % other.x, y % other.y)
 
 	infix fun inBoundsOf(matrix: Matrix<*>) = y in matrix.indices && x in matrix[0].indices
 
