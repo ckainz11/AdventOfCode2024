@@ -14,27 +14,17 @@ class Day14(override val input: String) : Day<Int>(input) {
 	private val robots = initialRobots.normalizeVelocities(bounds)
 
 	override fun solve1(): Int = robots
-		.moveFor(seconds = 100)
+		.moveForSeconds(100)
 		.getSafetyFactor()
 
-	override fun solve2(): Int {
-		var minSafetyToSeconds = Int.MAX_VALUE to -1
-		var movableRobots = robots
-
-		// Christmas tree is at the second with the lowest safety level
-		// credit: https://www.reddit.com/r/adventofcode/comments/1he0g67/2024_day_14_part_2_the_clue_was_in_part_1/
-		repeat(10000) { sec ->
-			movableRobots = movableRobots.moveFor(seconds = 1)
-			val safetyFactor = movableRobots.getSafetyFactor()
-			if (safetyFactor < minSafetyToSeconds.first) {
-				minSafetyToSeconds = safetyFactor to sec
-			}
-		}
-		return minSafetyToSeconds.second + 1
-	}
+	// Christmas tree is at the lowest safety level
+	// credit: https://www.reddit.com/r/adventofcode/comments/1he0g67/2024_day_14_part_2_the_clue_was_in_part_1/
+	override fun solve2(): Int = generateSequence(robots to 0) { (robots, second) -> robots.moveForSeconds(1) to second + 1 }
+		.takeWhile { it.second < 10000 }
+		.minBy { it.first.getSafetyFactor() }.second
 
 	private fun List<Robot>.normalizeVelocities(bounds: Point) = map { it.normalizeVelocity(bounds) }
-	private fun List<Robot>.moveFor(seconds: Int) = map { it.moveForSeconds(seconds, bounds) }
+	private fun List<Robot>.moveForSeconds(seconds: Int) = map { it.moveForSeconds(seconds, bounds) }
 	private fun List<Robot>.getSafetyFactor() = groupBy { getLocationOf(it.pos) }
 		.filter { it.key != Location.MIDDLE }
 		.map { it.value.size }
