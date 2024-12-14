@@ -48,13 +48,8 @@ class Day14(override val input: String) : Day<Int>(input) {
 			fun fromString(line: String) = line.allInts().let { (x, y, vx, vy) -> Robot(Point(x, y), Point(vx, vy)) }
 		}
 
-		fun moveForSeconds(seconds: Int, bounds: Point): Robot {
-			return copy(pos = (pos + velocity * seconds) % bounds)
-		}
-
-		fun normalizeVelocity(bounds: Point): Robot {
-			return copy(velocity = (velocity + bounds) % bounds)
-		}
+		fun moveForSeconds(seconds: Int, bounds: Point): Robot = copy(pos = (pos + velocity * seconds) % bounds)
+		fun normalizeVelocity(bounds: Point): Robot = copy(velocity = (velocity + bounds) % bounds)
 	}
 
 	enum class Location {
