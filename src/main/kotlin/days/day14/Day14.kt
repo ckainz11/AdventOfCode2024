@@ -14,30 +14,28 @@ class Day14(override val input: String) : Day<Int>(input) {
 	private val robots = initialRobots.normalizeVelocities(bounds)
 
 	override fun solve1(): Int = robots
-		.asSequence()
 		.moveFor(seconds = 100)
 		.getSafetyFactor()
 
 	override fun solve2(): Int {
-		return if (bounds.x == 11) 0 else 6355
+		var minSafetyToSeconds = Int.MAX_VALUE to -1
+		var movableRobots = robots
 
-		// searching for Christmas tree logic
-
-		/*val maxSeconds = 10000
-		var movableRobots = robots.map { it.normalizeVelocity(bounds) }
-		repeat(maxSeconds) { second ->
-			movableRobots = movableRobots.map { it.moveForSeconds(1, bounds) }
-			val robotLocations = movableRobots.map { it.pos }.toSet()
-			if (robotLocations.groupBy { it.y }.any { it.value.size > 30 }) {
-				println("----- Second ${second + 1} -----")
-				printRobots(robotLocations)
+		// Christmas tree is at the second with the lowest safety level
+		// credit: https://www.reddit.com/r/adventofcode/comments/1he0g67/2024_day_14_part_2_the_clue_was_in_part_1/
+		repeat(10000) { sec ->
+			movableRobots = movableRobots.moveFor(seconds = 1)
+			val safetyFactor = movableRobots.getSafetyFactor()
+			if (safetyFactor < minSafetyToSeconds.first) {
+				minSafetyToSeconds = safetyFactor to sec
 			}
-		}*/
+		}
+		return minSafetyToSeconds.second + 1
 	}
 
 	private fun List<Robot>.normalizeVelocities(bounds: Point) = map { it.normalizeVelocity(bounds) }
-	private fun Sequence<Robot>.moveFor(seconds: Int) = map { it.moveForSeconds(seconds, bounds) }
-	private fun Sequence<Robot>.getSafetyFactor() = groupBy { getLocationOf(it.pos) }
+	private fun List<Robot>.moveFor(seconds: Int) = map { it.moveForSeconds(seconds, bounds) }
+	private fun List<Robot>.getSafetyFactor() = groupBy { getLocationOf(it.pos) }
 		.filter { it.key != Location.MIDDLE }
 		.map { it.value.size }
 		.reduce(Int::times)
@@ -72,16 +70,4 @@ class Day14(override val input: String) : Day<Int>(input) {
 	enum class Location {
 		TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT, MIDDLE
 	}
-
-	private fun printRobots(robotLocations: Set<Point>) {
-		val grid = emptyMatrixOf(gridHeight, gridWidth, '.')
-		for ((y, row) in grid.withIndex()) {
-			for (x in row.indices) {
-				val robotAtPoint = Point(x, y) in robotLocations
-				print(if (robotAtPoint) '1' else '.')
-			}
-			println()
-		}
-	}
-
 }
