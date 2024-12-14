@@ -69,6 +69,15 @@ class PointTest {
 		assertEquals(expected, actual)
 	}
 
+	@Test
+	fun testRem() {
+		val point = Point(5, 5)
+		val other = Point(3, 3)
+		val expected = Point(2, 2)
+		val actual = point % other
+		assertEquals(expected, actual)
+	}
+
 	/*----- distance -----*/
 
 	@Test
