@@ -40,6 +40,8 @@ fun <T> Matrix<T>.getColumn(col: Int): List<T> = this.map { it[col] }
 fun <T> Matrix<T>.columns() = this[0].indices.map { this.getColumn(it) }
 fun <T> Matrix<T>.xRange() = this[0].indices
 fun <T> Matrix<T>.yRange() = this.indices
+fun <T> Matrix<T>.width() = this[0].size
+fun <T> Matrix<T>.height() = this.size
 
 /*----- Stream Operations -----*/
 
