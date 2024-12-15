@@ -14,6 +14,7 @@ import days.day11.Day11
 import days.day12.Day12
 import days.day13.Day13
 import days.day14.Day14
+import days.day15.Day15
 
 object Days {
 
@@ -31,7 +32,8 @@ object Days {
 		11 to ::Day11,
 		12 to ::Day12,
 		13 to ::Day13,
-		14 to ::Day14
+		14 to ::Day14,
+		15 to ::Day15
 
 	)
 }
