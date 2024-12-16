@@ -35,20 +35,6 @@ class Day16(override val input: String) : Day<Int>(input) {
 		}
 	}
 
-	class NodeB(val path: List<Point>, private val direction: Point, override var distance: Int, private val wallAt: ((Point) -> Boolean)) : ImplicitNode<NodeKey, NodeB> {
-
-		override val key = path.last() to direction
-
-		override fun getAdjacentNodes(): List<NodeB> = buildList {
-			if (!wallAt(path.last() + direction)) {
-				val next = path.last() + direction
-				add(NodeB(path + next, direction, 1, wallAt))
-			}
-			add(NodeB(path, direction.rotateClockwise(), 1000, wallAt))
-			add(NodeB(path, direction.rotateCounterClockwise(), 1000, wallAt))
-		}
-	}
-
 	override fun solve2(): Int {
 		val graph = ImplicitGraph<NodeKey, NodeB>()
 
@@ -69,6 +55,20 @@ class Day16(override val input: String) : Day<Int>(input) {
 		val startNode = NodeB(listOf(start), direction, 0) { p -> grid[p].isWall() }
 		graph.dijkstra(startNode)
 		return bestPath.size
+	}
+
+	class NodeB(val path: List<Point>, private val direction: Point, override var distance: Int, private val wallAt: ((Point) -> Boolean)) : ImplicitNode<NodeKey, NodeB> {
+
+		override val key = path.last() to direction
+
+		override fun getAdjacentNodes(): List<NodeB> = buildList {
+			if (!wallAt(path.last() + direction)) {
+				val next = path.last() + direction
+				add(NodeB(path + next, direction, 1, wallAt))
+			}
+			add(NodeB(path, direction.rotateClockwise(), 1000, wallAt))
+			add(NodeB(path, direction.rotateCounterClockwise(), 1000, wallAt))
+		}
 	}
 
 	private fun Char.isWall(): Boolean = this == '#'
