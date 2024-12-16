@@ -2,7 +2,6 @@ package util
 
 import java.util.*
 import kotlin.collections.HashMap
-import kotlin.collections.HashSet
 
 class ImplicitGraph<K, N : ImplicitNode<K, N>> {
 
@@ -15,7 +14,6 @@ class ImplicitGraph<K, N : ImplicitNode<K, N>> {
 
 	fun dijkstra(start: N): Map<K, Int> {
 		val distances = HashMap<K, Int>()
-		val visited = HashSet<K>()
 		val queue = PriorityQueue<N>()
 
 		distances[start.key] = start.distance
@@ -24,14 +22,12 @@ class ImplicitGraph<K, N : ImplicitNode<K, N>> {
 		while (queue.isNotEmpty()) {
 			val current = queue.poll()
 
-			if (dijkstraEarlyExit(current)) {
-				distances[current.key] = current.distance
-				break
-			}
 
 			if (current.key in distances && distances[current.key]!! < current.distance) continue
 
 			distances[current.key] = current.distance
+
+			if (dijkstraEarlyExit(current)) break
 
 			queue.addAll(current.getAdjacentNodes().map { node -> node.apply { distance = current.distance + node.distance } })
 		}
