@@ -40,6 +40,38 @@ class PointTest {
 		assertEquals(expected, actual)
 	}
 
+	@Test
+	fun testRotateCounterClockwiseCardinalDown() {
+		val point = Point(0, 2)
+		val expected = Point(2, 0)
+		val actual = point.rotateCounterClockwise()
+		assertEquals(expected, actual)
+	}
+
+	@Test
+	fun testRotateCounterClockwiseCardinalLeft() {
+		val point = Point(-2, 0)
+		val expected = Point(0, 2)
+		val actual = point.rotateCounterClockwise()
+		assertEquals(expected, actual)
+	}
+
+	@Test
+	fun testRotateCounterClockwiseCardinalUp() {
+		val point = Point(0, -2)
+		val expected = Point(-2, 0)
+		val actual = point.rotateCounterClockwise()
+		assertEquals(expected, actual)
+	}
+
+	@Test
+	fun testRotateCounterClockwiseCardinalRight() {
+		val point = Point(2, 0)
+		val expected = Point(0, -2)
+		val actual = point.rotateCounterClockwise()
+		assertEquals(expected, actual)
+	}
+
 	/* ----- arithmetic operations -----*/
 
 	@Test
