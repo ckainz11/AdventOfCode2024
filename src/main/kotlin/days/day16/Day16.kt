@@ -1,11 +1,9 @@
 package days.day16
 
 import setup.Day
-import util.Point
-import util.asMatrix
-import util.get
-import util.matrixIndexOfFirst
-import java.util.PriorityQueue
+import util.*
+
+typealias NodeKey = Pair<Point, Point>
 
 class Day16(override val input: String) : Day<Int>(input) {
 
@@ -15,65 +13,62 @@ class Day16(override val input: String) : Day<Int>(input) {
 	private val direction = Point.RIGHT
 
 	override fun solve1(): Int {
-		val scores = mutableMapOf(start to direction to 0)
+		val graph = ImplicitGraph<NodeKey, NodeA>()
 
-		val toVisit = PriorityQueue<Reindeer>().apply { add(Reindeer(start, direction, 0)) }
+		graph.dijkstraEarlyExit = { it.location == end }
 
-		while (toVisit.isNotEmpty()) {
-			val (location, direction, score) = toVisit.poll()
+		val startNode = NodeA(start, direction, 0, grid)
+		val distances = graph.dijkstra(startNode)
 
-			if (location == end) return score
+		return distances.filter { it.key.first == end }.values.min()
+	}
 
-			if (location to direction in scores && scores[location to direction]!! < score) continue
+	class NodeA(val location: Point, private val direction: Point, override var distance: Int, private val grid: Matrix<Char>) : ImplicitNode<NodeKey, NodeA> {
 
-			scores[location to direction] = score
+		override val key = location to direction
 
-			if (!grid[location].isWall())
-				toVisit.add(Reindeer(location + direction, direction, score + 1))
-
-			toVisit.add(Reindeer(location, direction.rotateClockwise(), score + 1000))
-			toVisit.add(Reindeer(location, direction.rotateCounterClockwise(), score + 1000))
+		override fun getAdjacentNodes(): List<NodeA> = buildList {
+			if (grid[location + direction] != '#')
+				add(NodeA(location + direction, direction, 1, grid))
+			add(NodeA(location, direction.rotateClockwise(), 1000, grid))
+			add(NodeA(location, direction.rotateCounterClockwise(), 1000, grid))
 		}
-		return 0
+	}
+
+	class NodeB(val path: List<Point>, private val direction: Point, override var distance: Int, private val wallAt: ((Point) -> Boolean)) : ImplicitNode<NodeKey, NodeB> {
+
+		override val key = path.last() to direction
+
+		override fun getAdjacentNodes(): List<NodeB> = buildList {
+			if (!wallAt(path.last() + direction)) {
+				val next = path.last() + direction
+				add(NodeB(path + next, direction, 1, wallAt))
+			}
+			add(NodeB(path, direction.rotateClockwise(), 1000, wallAt))
+			add(NodeB(path, direction.rotateCounterClockwise(), 1000, wallAt))
+		}
 	}
 
 	override fun solve2(): Int {
-		val scores = mutableMapOf(start to direction to 0)
-		val toVisit = PriorityQueue<Triple<List<Point>, Point, Int>>(compareBy { it.third })
-		toVisit.add(Triple(listOf(start), direction, 0))
+		val graph = ImplicitGraph<NodeKey, NodeB>()
 
 		var min = Int.MAX_VALUE
 		val bestPath = mutableSetOf<Point>()
 
-		while (toVisit.isNotEmpty()) {
-			val (path, direction, score) = toVisit.poll()
-
-			if (path.last() == end) {
-				if (score <= min) min = score
-				else return bestPath.size
-				bestPath.addAll(path)
+		graph.dijkstraEarlyExit = { node ->
+			var endSearch = false
+			if (node.path.last() == end) {
+				if (node.distance <= min) {
+					min = node.distance
+					bestPath.addAll(node.path)
+				} else endSearch = true
 			}
-
-			if (path.last() to direction in scores && scores[path.last() to direction]!! < score) continue
-
-			scores[path.last() to direction] = score
-
-			if (!grid[path.last()].isWall()) {
-				val next = path.last() + direction
-				toVisit.add(Triple(path + next, direction, score + 1))
-			}
-			toVisit.add(Triple(path, direction.rotateClockwise(), score + 1000))
-			toVisit.add(Triple(path, direction.rotateCounterClockwise(), score + 1000))
+			endSearch
 		}
 
-		return 0
-	}
-
-	data class Reindeer(val location: Point, val direction: Point, val score: Int) : Comparable<Reindeer> {
-
-		override fun compareTo(other: Reindeer): Int {
-			return score.compareTo(other.score)
-		}
+		val startNode = NodeB(listOf(start), direction, 0) { p -> grid[p].isWall() }
+		graph.dijkstra(startNode)
+		return bestPath.size
 	}
 
 	private fun Char.isWall(): Boolean = this == '#'
