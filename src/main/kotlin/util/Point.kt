@@ -27,6 +27,16 @@ data class Point(var x: Int, var y: Int) {
 		}
 	}
 
+	fun rotateCounterClockwise(): Point {
+		return when (this) {
+			UP * y -> LEFT * y
+			LEFT * x -> DOWN * x
+			DOWN * y -> RIGHT * y
+			RIGHT * x -> UP * x
+			else -> throw IllegalArgumentException("Point $this is not a cardinal direction")
+		}
+	}
+
 	fun cardinalNeighbors() = cardinals.map { this + it }
 
 	companion object {
