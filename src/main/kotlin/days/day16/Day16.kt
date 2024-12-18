@@ -2,6 +2,7 @@ package days.day16
 
 import setup.Day
 import util.*
+import java.util.*
 
 typealias NodeKey = Pair<Point, Point>
 
@@ -33,40 +34,31 @@ class Day16(override val input: String) : Day<Int>(input) {
 	}
 
 	override fun solve2(): Int {
-		val startNode = NodeB(listOf(start), direction, 0) { p -> grid[p].isWall() }
-		val graph = ImplicitGraph(startNode)
+		val queue = PriorityQueue<Triple<List<Point>, Point, Int>>(compareBy { it.third })
+		queue.add(Triple(listOf(start), Point.RIGHT, 0))
 
 		var min = Int.MAX_VALUE
-		val bestPath = mutableSetOf<Point>()
+		val best = HashSet<Point>()
+		val seen = HashMap<Pair<Point, Point>, Int>()
 
-		graph.dijkstraEarlyExit = { node ->
-			var endSearch = false
-			if (node.path.last() == end) {
-				if (node.distance <= min) {
-					min = node.distance
-					bestPath.addAll(node.path)
-				} else endSearch = true
+		while (queue.isNotEmpty()) {
+			val (path, dir, score) = queue.poll()
+
+			if (path.last() == end) {
+				if (score <= min) min = score
+				else return best.size
+				best.addAll(path)
 			}
-			endSearch
+
+			if (seen[path.last() to dir] != null && seen[path.last() to dir]!! < score) continue
+			seen[path.last() to dir] = score
+
+			if (grid[path.last() + dir] != '#')
+				queue.add(Triple(path + (path.last() + dir), dir, score + 1))
+
+			queue.add(Triple(path, dir.rotateClockwise(), score + 1000))
+			queue.add(Triple(path, dir.rotateCounterClockwise(), score + 1000))
 		}
-
-		graph.dijkstra()
-		return bestPath.size
+		return 0
 	}
-
-	class NodeB(val path: List<Point>, private val direction: Point, override var distance: Int, private val wallAt: ((Point) -> Boolean)) : ImplicitNode<NodeKey, NodeB> {
-
-		override val key = path.last() to direction
-
-		override fun getAdjacentNodes(): List<NodeB> = buildList {
-			if (!wallAt(path.last() + direction)) {
-				val next = path.last() + direction
-				add(NodeB(path + next, direction, 1, wallAt))
-			}
-			add(NodeB(path, direction.rotateClockwise(), 1000, wallAt))
-			add(NodeB(path, direction.rotateCounterClockwise(), 1000, wallAt))
-		}
-	}
-
-	private fun Char.isWall(): Boolean = this == '#'
 }
