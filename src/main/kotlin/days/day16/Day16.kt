@@ -13,13 +13,10 @@ class Day16(override val input: String) : Day<Int>(input) {
 	private val direction = Point.RIGHT
 
 	override fun solve1(): Int {
-		val graph = ImplicitGraph<NodeKey, NodeA>()
-
-		graph.dijkstraEarlyExit = { it.location == end }
-
 		val startNode = NodeA(start, direction, 0, grid)
-		val distances = graph.dijkstra(startNode)
-
+		val graph = ImplicitGraph(startNode)
+		graph.dijkstraEarlyExit = { it.location == end }
+		val distances = graph.dijkstra()
 		return distances.filter { it.key.first == end }.values.min()
 	}
 
@@ -36,7 +33,8 @@ class Day16(override val input: String) : Day<Int>(input) {
 	}
 
 	override fun solve2(): Int {
-		val graph = ImplicitGraph<NodeKey, NodeB>()
+		val startNode = NodeB(listOf(start), direction, 0) { p -> grid[p].isWall() }
+		val graph = ImplicitGraph(startNode)
 
 		var min = Int.MAX_VALUE
 		val bestPath = mutableSetOf<Point>()
@@ -52,8 +50,7 @@ class Day16(override val input: String) : Day<Int>(input) {
 			endSearch
 		}
 
-		val startNode = NodeB(listOf(start), direction, 0) { p -> grid[p].isWall() }
-		graph.dijkstra(startNode)
+		graph.dijkstra()
 		return bestPath.size
 	}
 
