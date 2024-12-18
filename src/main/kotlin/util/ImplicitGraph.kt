@@ -3,7 +3,7 @@ package util
 import java.util.*
 import kotlin.collections.HashMap
 
-class ImplicitGraph<K, N : ImplicitNode<K, N>> {
+class ImplicitGraph<K, N : ImplicitNode<K, N>>(private val start: N) {
 
 	/**
 	 * If this function returns true, the dijkstra algorithm will exit early.
@@ -12,7 +12,7 @@ class ImplicitGraph<K, N : ImplicitNode<K, N>> {
 	var dijkstraEarlyExit: ((N) -> Boolean)? = null
 	private fun dijkstraEarlyExit(node: N) = dijkstraEarlyExit?.invoke(node) ?: false
 
-	fun dijkstra(start: N): Map<K, Int> {
+	fun dijkstra(): Map<K, Int> {
 		val distances = HashMap<K, Int>()
 		val queue = PriorityQueue<N>()
 
