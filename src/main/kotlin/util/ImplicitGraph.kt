@@ -15,6 +15,7 @@ class ImplicitGraph<K, N : ImplicitNode<K, N>>(private val start: N) {
 	fun dijkstra(): Map<K, Int> {
 		val distances = HashMap<K, Int>()
 		val queue = PriorityQueue<N>()
+		val visited = mutableSetOf<K>()
 
 		distances[start.key] = start.distance
 		queue.add(start)
@@ -22,14 +23,20 @@ class ImplicitGraph<K, N : ImplicitNode<K, N>>(private val start: N) {
 		while (queue.isNotEmpty()) {
 			val current = queue.poll()
 
+			if (current.key in visited) continue
+			visited.add(current.key)
 
-			if (current.key in distances && distances[current.key]!! < current.distance) continue
+			if (dijkstraEarlyExit(current))
+				break
 
-			distances[current.key] = current.distance
-
-			if (dijkstraEarlyExit(current)) break
-
-			queue.addAll(current.getAdjacentNodes().map { node -> node.apply { distance = current.distance + node.distance } })
+			queue.addAll(current.getAdjacentNodes()
+				.filter {
+					it.key !in visited &&
+					distances[current.key]!! + it.distance < (distances[it.key] ?: Int.MAX_VALUE)
+				}
+				.map { node -> node.apply { distance = current.distance + node.distance } }
+				.onEach { node -> distances[node.key] = node.distance }
+			)
 		}
 
 		return distances
