@@ -5,14 +5,38 @@ import kotlin.collections.HashMap
 
 class ImplicitGraph<K, N : ImplicitNode<K, N>>(private val start: N) {
 
-	/**
-	 * If this function returns true, the dijkstra algorithm will exit early.
-	 * This is useful, for example, if you only want to find the shortest path to a specific node.
-	 */
-	var dijkstraEarlyExit: ((N) -> Boolean)? = null
-	private fun dijkstraEarlyExit(node: N) = dijkstraEarlyExit?.invoke(node) ?: false
+	companion object {
 
-	fun dijkstra(): Map<K, Int> {
+		fun <K, N : ImplicitNode<K, N>> withStartNode(start: N) = ImplicitGraph(start)
+	}
+
+	/**
+	 * Finds the shortest path to a node with the given key.
+	 * @param key the key of the node to find the shortest path to.
+	 * @return the length of the shortest path to the node with the given key, or null if there is no path.
+	 */
+	fun shortestPathToOrNull(key: K): Int? {
+		val distances = dijkstra()
+		return distances[key]
+	}
+
+	/**
+	 * Finds the shortest path to a node with the given key.
+	 * @param key the key of the node to find the shortest path to.
+	 * @return the length of the shortest path to the node with the given key.
+	 * @throws IllegalStateException if there is no path to the node with the given key.
+	 */
+	fun shortestPathTo(key: K): Int {
+		val distances = dijkstra { it.key == key }
+		return distances[key] ?: error("No path to $key")
+	}
+
+	/**
+	 * Finds the shortests paths to all nodes in the graph.
+	 * @param earlyExitIf a function that returns true if the algorithm should stop early.
+	 * @return a map of the shortest paths to all nodes in the graph.
+	 */
+	fun dijkstra(earlyExitIf: ((N) -> Boolean)? = null): Map<K, Int> {
 		val distances = HashMap<K, Int>()
 		val queue = PriorityQueue<N>()
 		val visited = mutableSetOf<K>()
@@ -26,7 +50,7 @@ class ImplicitGraph<K, N : ImplicitNode<K, N>>(private val start: N) {
 			if (current.key in visited) continue
 			visited.add(current.key)
 
-			if (dijkstraEarlyExit(current))
+			if (earlyExitIf != null && earlyExitIf(current))
 				break
 
 			queue.addAll(current.getAdjacentNodes()
@@ -45,8 +69,8 @@ class ImplicitGraph<K, N : ImplicitNode<K, N>>(private val start: N) {
 
 /**
  * An implicit graph node.
- * @param distance the cost to reach this node from the previous node.
- * @param getAdjacentNodes a function that returns the nodes that are adjacent to this node.
+ * @property distance the cost to reach this node from the previous node.
+ * @property getAdjacentNodes a function that returns the nodes that are adjacent to this node.
  */
 interface ImplicitNode<K, N : ImplicitNode<K, N>> : Comparable<N> {
 

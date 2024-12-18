@@ -17,35 +17,37 @@ class Day18(override val input: String) : Day<String>(input) {
 
 	private val grid = emptyMatrixOf(maxX + 1, maxY + 1, false)
 
-	private val start = NodeA(Point(0, 0), 0) { it inBoundsOf grid && it !in fallingBytes }
+	private val startNode = Node(Point(0, 0), 0) { it inBoundsOf grid && it !in fallingBytes }
 	private val end = Point(maxX, maxY)
 
-	override fun solve1(): String {
-		val graph = ImplicitGraph(start)
-		graph.dijkstraEarlyExit = { it.position == end }
-		val distances = graph.dijkstra()
-		val steps = distances[end] ?: -1
-		return steps.toString()
+	override fun solve1(): String = ImplicitGraph.withStartNode(startNode)
+		.shortestPathToOrNull(end)?.toString() ?: "No path found"
+
+	override fun solve2(): String {
+		var low = 0
+		var high = bytes.size - 1
+		while (low < high) {
+			val mid = low + (high - low) / 2
+
+			val fallenBytes = bytes.take(mid).toSet()
+			val startNode = Node(Point(0, 0), 0) { it inBoundsOf grid && it !in fallenBytes }
+			val found = ImplicitGraph.withStartNode(startNode).shortestPathToOrNull(end) == null
+
+			if (found) high = mid
+			else low = mid + 1
+		}
+		return bytes[low - 1].let { "${it.x},${it.y}" }
 	}
 
-	override fun solve2(): String = (1..<bytes.size).map { bytes.take(numOfFallenBytes + it) }
-		.first { fallenBytes ->
-			val graph = ImplicitGraph(NodeA(Point(0, 0), 0) { it inBoundsOf grid && it !in fallenBytes })
-			graph.dijkstraEarlyExit = { it.position == end }
-			val distances = graph.dijkstra()
-			val steps = distances[end] ?: -1
-			steps == -1
-		}.last().let { "${it.x},${it.y}" }
-
-	data class NodeA(val position: Point, override var distance: Int, private val filter: ((Point) -> Boolean)) : ImplicitNode<Point, NodeA> {
+	data class Node(val position: Point, override var distance: Int, private val valid: ((Point) -> Boolean)) : ImplicitNode<Point, Node> {
 
 		override val key = position
 
-		override fun getAdjacentNodes(): List<NodeA> {
+		override fun getAdjacentNodes(): List<Node> {
 			return position
 				.cardinalNeighbors()
-				.filter { filter(it) }
-				.map { NodeA(it, 1, filter) }
+				.filter { valid(it) }
+				.map { Node(it, 1, valid) }
 		}
 	}
 }
