@@ -5,7 +5,7 @@ import util.sections
 
 class Day19(override val input: String) : Day<Long>(input) {
 
-	private val towels = input.sections()[0].split(", ").toSet()
+	private val towels = input.sections()[0].split(", ")
 	private val designs = input.sections()[1].lines()
 
 	override fun solve1(): Long = designs.count { it.countPossibilities() > 0 }.toLong()
