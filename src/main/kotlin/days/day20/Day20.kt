@@ -14,7 +14,7 @@ class Day20(override val input: String) : Day<Int>(input) {
 	private val start = grid.matrixIndexOfFirst { it == 'S' }
 	private val end = grid.matrixIndexOfFirst { it == 'E' }
 
-	private val path = getRaceTrack()
+	private val path = getPath()
 
 	override fun solve1(): Int = path.indices.sumOf { it.cheatFor(2) }
 	override fun solve2(): Int = path.indices.sumOf { it.cheatFor(20) }
@@ -28,17 +28,11 @@ class Day20(override val input: String) : Day<Int>(input) {
 		}
 	}
 
-	private fun getRaceTrack(): List<Point> {
-		val path = mutableSetOf(start)
-		var current = start
-		while (current != end) {
-			val next = current.cardinalNeighbors()
-				.first { !it.isWall() && it !in path }
-
-			path.add(next)
-			current = next
-		}
-		return path.toList()
+	private fun getPath(): List<Point> {
+		val seen = mutableSetOf(start)
+		return generateSequence(start) {
+			it.cardinalNeighbors().first { neighbor -> !neighbor.isWall() && seen.add(neighbor) }
+		}.takeWhile { it != end }.toList() + end
 	}
 
 	private fun Point.isWall() = grid[this] == '#'
