@@ -17,3 +17,7 @@ private fun allNumbersInString(line: String): List<String> {
 fun String.sections() = this.split("\n\n")
 
 fun String.asMatrix() = this.lines().map { it.toCharArray().toList() }
+
+/*----- permutations -----*/
+
+fun String.permutations() = this.toList().permutations().map { it.join() }
