@@ -21,6 +21,7 @@ import days.day18.Day18
 import days.day19.Day19
 import days.day20.Day20
 import days.day21.Day21
+import days.day22.Day22
 
 object Days {
 
@@ -45,7 +46,8 @@ object Days {
 		18 to ::Day18,
 		19 to ::Day19,
 		20 to ::Day20,
-		21 to ::Day21
+		21 to ::Day21,
+		22 to ::Day22
 
 	)
 }
