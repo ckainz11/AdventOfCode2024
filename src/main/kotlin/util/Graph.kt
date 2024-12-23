@@ -1,53 +1,43 @@
 package util
 
-import java.util.*
-
 /**
  * A standard graph implementation with nodes and edges.
  */
-data class Graph<N : Node, E : Edge<N>>(val nodes: List<N>, val edges: List<E>) {
+data class Graph<N : Node, E : Edge<N>>(val nodes: Set<N>, val edges: List<E>) {
 
-	private val adjacencyList = mutableMapOf<N, List<E>>()
-
-	/*
-	 * If this function returns true, the algorithm will stop early.
-	 */
-	var dijkstraEarlyExit: ((N) -> Boolean)? = null
-	private fun dijkstraEarlyExit(node: N) = dijkstraEarlyExit?.invoke(node) ?: false
+	val adjacencyList = mutableMapOf<N, Set<N>>()
 
 	init {
 		nodes.forEach { node ->
-			adjacencyList[node] = edges.filter { it.from == node }
+			adjacencyList[node] = edges.filter { it.from == node }.map { it.to }.toSet()
 		}
 	}
 
-	fun dijkstra(start: N): Map<N, Int> {
-		val distances = mutableMapOf<N, Int>()
-		val visited = mutableSetOf<N>()
-		val queue = PriorityQueue<Pair<N, Int>>(compareBy { it.second })
+	/**
+	 * Bron-Kerbosch algorithm to find all maximal cliques in the graph.
+	 */
+	fun bronKerbosch(): Set<Set<N>> {
+		val result = mutableSetOf<Set<N>>()
+		bronKerbosch(mutableSetOf(), nodes.toMutableSet(), mutableSetOf(), result)
+		return result
+	}
 
-		distances[start] = 0
-		queue.add(start to 0)
+	private fun bronKerbosch(r: Set<N>, p: MutableSet<N>, x: MutableSet<N>, result: MutableSet<Set<N>>) {
+		if (p.isEmpty() && x.isEmpty())
+			result.add(r.toSet())
 
-		while (queue.isNotEmpty()) {
-			val (current) = queue.poll()
+		val pivot = (p + x).maxByOrNull { adjacencyList[it]?.size ?: 0 }
+		val neighbors = adjacencyList.getOrDefault(pivot, emptySet())
+		val toExplore = p - neighbors
 
-			if (dijkstraEarlyExit(current)) break
-
-			if (current in visited) continue
-
-			visited.add(current)
-
-			adjacencyList[current]?.forEach { edge ->
-				val newDistance = distances[current]!! + edge.weight
-				if (distances[edge.to] == null || newDistance < distances[edge.to]!!) {
-					distances[edge.to] = newDistance
-					queue.add(edge.to to newDistance)
-				}
-			}
+		toExplore.forEach { node ->
+			val newR = (r + node).toMutableSet()
+			val newP = p.intersect(adjacencyList[node] ?: emptySet()).toMutableSet()
+			val newX = x.intersect(adjacencyList[node] ?: emptySet()).toMutableSet()
+			bronKerbosch(newR, newP, newX, result)
+			p -= node
+			x += node
 		}
-
-		return distances
 	}
 }
 
